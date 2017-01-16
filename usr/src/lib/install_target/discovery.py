@@ -673,7 +673,8 @@ class TargetDiscovery(Checkpoint):
             new_disk = self.discover_disk(drive)
 
             # skip invalid drives and CDROM drives
-            if new_disk is None or new_disk.iscdrom or new_disk.ctd == "dump":
+            if new_disk is None or new_disk.iscdrom or \
+               new_disk.ctd == "dump" or "diskette" in new_disk.ctd:
                 continue
 
             # skip any disk we've already discovered
@@ -935,22 +936,8 @@ class TargetDiscovery(Checkpoint):
             if new_disk is not None:
                 self.root.insert_children(new_disk)
 
-        elif self.search_type == ZPOOL_SEARCH_NAME:
-            self.discover_entire_system(add_physical=False)
-            self.root.insert_children(self.discover_zpools(
-                self.search_name))
-
-            # Add all Boot Environments that are contained in this zpool
-            self.discover_BEs(self.search_name)
-
         else:
             self.discover_entire_system()
-
-            # Add the discovered zpool objects
-            self.root.insert_children(self.discover_zpools())
-
-            # Add all Boot Environments
-            self.discover_BEs()
 
         # Add the root node to the DOC
         self.doc.persistent.insert_children(self.root)

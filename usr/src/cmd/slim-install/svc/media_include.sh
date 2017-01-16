@@ -98,9 +98,4 @@ setup_user_dirs()
 	mountfs -O /root tmpfs - swap || exit $SMF_EXIT_ERR_FATAL
 	cd /.cdrom/root
 	find . -print | cpio -pmud /root
-
-	# Mount /jack home directory onto swap
-	mountfs -O /jack tmpfs - swap || exit $SMF_EXIT_ERR_FATAL
-	cd /.cdrom/jack
-	find . -print | cpio -pmud /jack
 }

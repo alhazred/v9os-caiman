@@ -24,14 +24,12 @@
 # Use is subject to license terms.
 #
 
-SUBDIRS		= $(MACH)
-SUBDIRS		+= $(MACH64)
+LIBRARY		= _libaiscf
 
-all :=          TARGET= all
-clean :=        TARGET= clean
-clobber :=      TARGET= clobber
-install :=      TARGET= install
-lint :=         TARGET= lint
+OBJECTS		= libaiscf_instance.o libaiscf_service.o  \
+			  libaiscf_backend.o
+
+CPYTHONLIBS	= _libaiscf.so 
 
 PYMODS		= libaiscf.py
 
@@ -41,31 +39,35 @@ PRIVHDRS	=
 EXPHDRS		=
 HDRS		= $(EXPHDRS) $(PRIVHDRS)
 
+CLOBBERFILES	= $(PYCMODS)
+CLEANFILES	= $(CLOBBERFILES)
+
 python:
 	$(PYTHON) -m compileall -l $(@D)
 
 include ../Makefile.lib
 
-all clean clobber install lint: $(SUBDIRS)
+INCLUDE		= -I/usr/include/python2.6
 
-CLOBBERFILES	= $(PYCMODS)
-CLEANFILES	= $(CLOBBERFILES)
+CPPFLAGS	+= ${INCLUDE} $(CPPFLAGS.master) -D_FILE_OFFSET_BITS=64
+CFLAGS		+= $(DEBUG_CFLAGS) -Xa ${CPPFLAGS} -xc99
+SOFLAGS		+= -L$(ROOTUSRLIB) -R$(ROOTUSRLIB:$(ROOT)%=%) -laiscf -lscf
 
-all:		$(HDRS) .WAIT python $(SUBDIRS)
+static:	 $(OBJECTS)
+
+dynamic:	$(CPYTHONLIB)
+
+all:		$(HDRS) dynamic python
 
 install_h:
 
-install:	all .WAIT $(SUBDIRS) .WAIT \
+install:	all .WAIT \
 		$(ROOTPYTHONVENDOR) \
 		$(ROOTPYTHONVENDORINSTALL) \
+		$(ROOTPYTHONVENDORINSTALLLIBS) \
 		$(ROOTPYTHONVENDORINSTALLMODS) \
 		$(ROOTPYTHONVENDORINSTALLCMODS)
 
 lint:		lint_SRCS
-
-$(SUBDIRS):	FRC
-	cd $@; pwd; $(MAKE) $(TARGET)
-
-FRC:
 
 include ../Makefile.targ

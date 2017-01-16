@@ -368,7 +368,7 @@ class TargetInstantiation(Checkpoint):
                 if fs.action == "create":
                     if fs.in_be:
                         # Append filesystem name to BE filesystem list
-                        be_fs_list.append(fs.name)
+                        be_fs_list.append('/' + fs.name)
                         zfs_options = fs.get_first_child(class_type=Options)
                         # Could be None, but still need to pass a value
                         be_fs_zfs_properties_list.append(zfs_options)

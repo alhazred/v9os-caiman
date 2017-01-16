@@ -1,0 +1,53 @@
+***************
+*** 245,273 ****
+  	-@mkdir $@ 2>/dev/null ; $(CHMOD) 777 $@
+  	-@mkdir $@/$(ARCH) 2>/dev/null ; $(CHMOD) 777 $@/$(ARCH)
+  
+- objs/$(ARCH)/%.o pics/$(ARCH)/%.o: $(SRCDIR)/%.c
+- 	$(COMPILE.c) -o $@ $<
+- 
+  objs/$(ARCH)/$(LIBRARY): objs .WAIT $(OBJS)
+  	$(BUILD.AR)
+  
+  $(DYNLIB): pics .WAIT $(PICS)
+- 	$(LD) $(LDBITS) -G -z text $(SOFLAGS) -o $@ $(PICS)
+  
+  $(DYNLIBLINK): pics
+  
+  LIBLINKS=	$(DYNLIBLINK) $(ROOTADMINLIBDYNLIBLINK) $(ROOTUSRLIBDYNLIBLINK)
+- 
+- LIBLINKS64=	$(DYNLIBLINK) $(ROOTADMINLIBDYNLIBLINK64) $(ROOTUSRLIBDYNLIBLINK64)
+- 
+  $(LIBLINKS):
+  	$(RM) $@; $(SYMLINK) ./$(BASEDYNLIB) $@
+  
+- $(LIBLINKS64):
+- 	$(RM) $@; $(SYMLINK) ./$(BASEDYNLIB) $@
+- 
+  $(CPYTHONLIB): pics .WAIT $(PICS)
+- 	$(LD) $(LDBITS) -G -z text $(SOFLAGS) -o $@ $(PICS)
+  
+  $(PLIB): profs libp $(PROFS)
+  	$(BUILD.AR)
+--- 236,256 ----
+  	-@mkdir $@ 2>/dev/null ; $(CHMOD) 777 $@
+  	-@mkdir $@/$(ARCH) 2>/dev/null ; $(CHMOD) 777 $@/$(ARCH)
+  
+  objs/$(ARCH)/$(LIBRARY): objs .WAIT $(OBJS)
+  	$(BUILD.AR)
+  
+  $(DYNLIB): pics .WAIT $(PICS)
++ 	$(LD) -G -z text $(SOFLAGS) -o $@ $(PICS)
+  
+  $(DYNLIBLINK): pics
+  
+  LIBLINKS=	$(DYNLIBLINK) $(ROOTADMINLIBDYNLIBLINK) $(ROOTUSRLIBDYNLIBLINK)
++ 		
+  $(LIBLINKS):
+  	$(RM) $@; $(SYMLINK) ./$(BASEDYNLIB) $@
+  
+  $(CPYTHONLIB): pics .WAIT $(PICS)
++ 	$(LD) -G -z text $(SOFLAGS) -o $@ $(PICS)
+  
+  $(PLIB): profs libp $(PROFS)
+  	$(BUILD.AR)

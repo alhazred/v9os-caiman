@@ -39,6 +39,7 @@ SUBDIRS=	bootmgmt \
 		install_target \
 		install_transfer \
 		install_utils \
+		libaimdns \
 		libaiscf \
 		libaiscf_pymod \
 		liberrsvc \

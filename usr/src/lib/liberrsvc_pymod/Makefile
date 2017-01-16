@@ -24,18 +24,12 @@
 # Use is subject to license terms.
 #
 
-SUBDIRS		= $(MACH)
-SUBDIRS		+= $(MACH64)
+LIBRARY		= _liberrsvc
 
-all :=          TARGET= all
-clean :=        TARGET= clean
-clobber :=      TARGET= clobber
-install :=      TARGET= install
-lint :=         TARGET= lint
+OBJECTS		= liberrsvc.o \
+		  liberrsvc_wrap.o
 
-include ../Makefile.lib
-
-all clean clobber install lint: $(SUBDIRS)
+CPYTHONLIBS	= _liberrsvc.so
 
 PYMODS		= errsvc.py \
 		liberrsvc.py
@@ -45,21 +39,36 @@ PYCMODS		= $(PYMODS:%.py=%.pyc)
 CLOBBERFILES	= $(PYCMODS) liberrsvc_wrap.c liberrsvc.py
 CLEANFILES	= $(CLOBBERFILES)
 
+include ../Makefile.lib
+
 PRIVHDRS	=
 EXPHDRS		=
 HDRS		= $(EXPHDRS) $(PRIVHDRS)
 
+INCLUDE		= -I/usr/include/python2.6 -I../liberrsvc
+
+CPPFLAGS	+= ${INCLUDE} $(CPPFLAGS.master) -D_FILE_OFFSET_BITS=64
+CFLAGS		+= $(DEBUG_CFLAGS) -Xa ${CPPFLAGS} 
+SOFLAGS		+= -L$(ROOTUSRLIB) -L$(ROOTADMINLIB) \
+		-R$(ROOTUSRLIB:$(ROOT)%=%)  \
+		-R$(ROOTADMINLIB:$(ROOT)%=%) -L/lib \
+		-lpython2.6 -lm -lc -zdefs
+
+static:
+
+dynamic:	$(CPYTHONLIB)
 
 python:
 	$(PYTHON) -m compileall -l $(@D)
 
-all:		$(HDRS) .WAIT python $(SUBDIRS)
+all:		$(HDRS) dynamic .WAIT python $(SUBDIRS)
 
 install_h:
 
-install:	all .WAIT $(SUBDIRS) .WAIT \
+install:	all .WAIT \
 		$(ROOTPYTHONVENDOR) \
 		$(ROOTPYTHONVENDORINSTALL) \
+		$(ROOTPYTHONVENDORINSTALLLIBS) \
 		$(ROOTPYTHONVENDORINSTALLMODS) \
 		$(ROOTPYTHONVENDORINSTALLCMODS)
 
@@ -68,7 +77,7 @@ lint:		lint_SRCS
 liberrsvc_wrap.c liberrsvc.py:
 	swig -python liberrsvc.i
 
-$(SUBDIRS):	liberrsvc_wrap.c liberrsvc.py FRC
+$(SUBDIRS):	FRC
 	cd $@; pwd; $(MAKE) $(TARGET)
 
 FRC:

@@ -116,7 +116,7 @@ cscope:
 cc-version:
 	@if $(CC) -flags >/dev/null 2>/dev/null; then	\
 		$(ECHO) 32-bit compiler;		\
-		$(ECHO) "$(CC)";				\
+		which $(CC);				\
 		$(CC) -V 2>&1 | head -1;		\
 	else						\
 		$(ECHO) No 32-bit compiler found;	\
@@ -124,10 +124,10 @@ cc-version:
 	fi
 
 cc64-version:
-	@__VERSION=`$(CC) -m64 -E /dev/null 2>&1 | grep -v \+ > /dev/null`; \
+	@__VERSION=`$(CC) -m64 -E /dev/null 2>&1 > /dev/null`; \
 	if [ -z "$$__VERSION" ]; then			\
 		$(ECHO) 64-bit compiler;		\
-		$(ECHO) "$(CC)";				\
+		which $(CC);				\
 		$(CC) -V 2>&1 | head -1;		\
 	else						\
 		$(ECHO) No 64-bit compiler found;	\

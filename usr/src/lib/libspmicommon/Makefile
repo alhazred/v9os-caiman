@@ -27,20 +27,27 @@
 # SPMI common library makefile
 #
 
-include ../Makefile.lib
+LIBRARY	= libspmicommon.a
+VERS	= .1
 
-SUBDIRS=        $(MACH)
-$(BUILD64)SUBDIRS += $(MACH64)
+OBJECTS	= \
+	common_arch.o \
+	common_boolean.o \
+	common_client.o \
+	common_linklist.o \
+	common_misc.o \
+	common_mmap.o \
+	common_mount.o \
+	common_pathcanon.o \
+	common_post.o \
+	common_proc.o \
+	common_process_control.o \
+	common_scriptwrite.o \
+	common_strlist.o \
+	common_url.o \
+	common_util.o
 
-all :=          TARGET= all
-clean :=        TARGET= clean
-clobber :=      TARGET= clobber
-install :=      TARGET= install
-lint :=         TARGET= lint
-
-.KEEP_STATE:
-
-all clean clobber install lint: $(SUBDIRS)
+SRCS =	$(OBJECTS:.o=.c)
 
 PRIVHDRS	= \
 	spmicommon_lib.h \
@@ -50,7 +57,12 @@ PRIVHDRS	= \
 EXPHDRS		= spmicommon_api.h
 HDRS		= $(EXPHDRS) $(PRIVHDRS)
 
-SRCDIR		= ..
+include ../Makefile.lib
+
+CPPFLAGS	+= -D${ARCH}
+CFLAGS		+= $(DEBUG_CFLAGS) -Xa ${CPPFLAGS}
+LDFLAGS		+=
+SOFLAGS		+= -ldl -lwanboot
 
 LINTERR		= lint_errors
 LINTFILES	= ${SRCS:%.c=${ARCH}/%.ln}
@@ -62,13 +74,26 @@ MSG_DOMAIN	= SUNW_INSTALL_LIBCOMMON
 
 .KEEP_STATE:
 
-all clean clobber install lint: $(SUBDIRS)
+all: $(HDRS) .WAIT static dynamic
 
-install:	all .WAIT $(SUBDIRS) .WAIT msgs .WAIT $(INSTMSGS)
+static: $(LIBS)
 
-install_test:	all .WAIT $(SUBDIRS) .WAIT $(INSTMSGS)
+dynamic: $(DYNLIB) $(DYNLIBLINK)
+
+install:	all .WAIT \
+		$(ROOTADMINLIB) .WAIT $(ROOTADMINLIBS) $(ROOTADMINLIBDYNLIB) \
+		$(ROOTADMINLIBDYNLIBLINK)
+
+install_test:	all .WAIT \
+		$(ROOTADMINLIB) $(ROOTADMINLIBS) $(ROOTADMINLIBDYNLIB) \
+		$(ROOTADMINLIBDYNLIBLINK) .WAIT $(INSTMSGS)
 
 install_h:	$(ROOTUSRINCLEXP)
+
+common_proc:	objs/$(ARCH)/$(LIBRARY)
+		$(CC) -o objs/$(ARCH)/$@ -DMODULE_TEST $@.c \
+			objs/$(ARCH)/common_proc.o \
+			objs/$(ARCH)/$(LIBRARY)
 
 msgs: ${MSG_DOMAIN}.po
 
@@ -78,16 +103,19 @@ ${MSG_DOMAIN}.po: ${SRCS} ${HDRS}
 		xgettext -d ${MSG_DOMAIN} -s \
 			-c "i18n:" - >/dev/null 2>&1
  
+# Create a message file with "translated" test strings.
+# Turn the po file into an mo file ready for testing.
+msgs_test: ${SRCS} ${HDRS}
+	@echo "Making test messages file ${MSG_DOMAIN}.po"
+	@${COMPILE.c} -C -E ${SRCS} 2>/dev/null | \
+		xgettext -d ${MSG_DOMAIN} -s \
+			-c "i18n:" -m "öýê!" - >/dev/null 2>&1
+	@msgfmt -o ${MSG_DOMAIN}.mo ${MSG_DOMAIN}.po
+
 lint:  ${SRCS} ${HDRS}
 	${LINT.c} ${SRCS}
 
-install_h:      $(EXPHDRS:%=$(ROOTINC)/%)
-
-check: $(CHECKHDRS)
-
-$(SUBDIRS):     FRC
-	@cd $@; pwd; $(MAKE) $(TARGET)
-
-FRC:
+cstyle:	$(SRCS) $(PRIVHDRS) $(PUBHDRS)
+	cstyle $(SRCS) $(PRIVHDRS) $(PUBHDRS)
 
 include ../Makefile.targ

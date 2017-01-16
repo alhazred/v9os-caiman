@@ -21,18 +21,11 @@
 # Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
 #
 
-SUBDIRS		= $(MACH)
-SUBDIRS		+= $(MACH64)
+LIBRARY		= _logger
 
-all :=          TARGET= all
-clean :=        TARGET= clean
-clobber :=      TARGET= clobber
-install :=      TARGET= install
-lint :=         TARGET= lint
+OBJECTS		=
 
-.KEEP_STATE:
-
-all clean clobber install lint: $(SUBDIRS)
+CPYTHONLIBS	= _logger.so
 
 PYMODS		= logger.py
 
@@ -47,20 +40,32 @@ PRIVHDRS	=
 EXPHDRS		=
 HDRS		= $(EXPHDRS) $(PRIVHDRS)
 
+INCLUDE		= -I/usr/include/python2.6 -I../logger
+
+CPPFLAGS	+= ${INCLUDE} $(CPPFLAGS.master) -D_FILE_OFFSET_BITS=64
+CFLAGS		+= $(DEBUG_CFLAGS) -Xa ${CPPFLAGS}
+SOFLAGS		+= -L$(ROOTUSRLIB) -L$(ROOTADMINLIB) \
+		-R$(ROOTUSRLIB:$(ROOT)%=%)  \
+		-R$(ROOTADMINLIB:$(ROOT)%=%) -L/lib \
+		-lpython2.6 -lm -lc -zdefs
+
 static:
+
+dynamic:	$(CPYTHONLIB)
 
 python:
 	$(PYTHON) -d -m compileall -l $(@D)
 
-all:		$(HDRS) .WAIT python .WAIT $(SUBDIRS)
+all:		$(HDRS) dynamic .WAIT python $(SUBDIRS)
 
 install_h:
 
-install:	all .WAIT $(SUBDIRS) .WAIT \
+install:	all .WAIT \
 		$(ROOTPYTHONVENDOR) \
                 $(ROOTPYTHONVENDORSOLINSTALL) \
 		$(ROOTPYTHONVENDORSOLINSTALLMODS) \
-		$(ROOTPYTHONVENDORSOLINSTALLCMODS)
+		$(ROOTPYTHONVENDORSOLINSTALLCMODS) \
+		$(ROOTPYTHONVENDORSOLINSTALLLIBS)
 
 lint:		lint_SRCS
 

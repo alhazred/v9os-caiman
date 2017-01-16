@@ -24,35 +24,49 @@
 # Use is subject to license terms.
 #
 
-include ../Makefile.lib
+SUBDIRS		= 
 
-SUBDIRS=        $(MACH)
-$(BUILD64)SUBDIRS += $(MACH64)
+all		:= TARGET= all
+install		:= TARGET= install
+clean		:= TARGET= clean
+clobber		:= TARGET= clobber
+lint		:= TARGET= lint
 
-all :=          TARGET= all
-clean :=        TARGET= clean
-clobber :=      TARGET= clobber
-install :=      TARGET= install
-lint :=         TARGET= lint
+LIBRARY		= libaiscf.a
+VERS		= .1
 
-.KEEP_STATE:
-
-all clean clobber install lint: $(SUBDIRS)
+OBJECTS		= ai_utils.o \
+		  ai_trans.o
 
 PRIVHDRS	=
 EXPHDRS		= libaiscf.h
 HDRS		= $(EXPHDRS) $(PRIVHDRS)
 
-install:	all
+include ../Makefile.lib
+
+INCLUDE		+=
+
+CPPFLAGS	+= $(INCLUDE) $(CPPFLAGS.master)
+CFLAGS		+= $(DEBUG_CFLAGS) -Xa $(CPPFLAGS)
+SOFLAGS		+= -L$(ROOTADMINLIB) -R$(ROOTADMINLIB:$(ROOT)%=%)
+
+static:		$(LIBS)
+
+dynamic:	$(DYNLIB) $(DYNLIBLINK)
+
+all:		$(HDRS) static dynamic .WAIT $(SUBDIRS)
 
 install_h:	$(EXPHDRS:%=$(ROOTINC)/%)
 
-check: $(CHECKHDRS)
+install:	all .WAIT \
+		$(ROOTUSRLIB) $(ROOTUSRLIBS) $(ROOTUSRLIBDYNLIB) \
+		$(ROOTUSRLIBDYNLIBLINK) 
+
+lint:		lint_SRCS
 
 $(SUBDIRS):	FRC
-	@cd $@; pwd; $(MAKE) $(TARGET)
+	cd $@; pwd; $(MAKE) $(TARGET)
 
 FRC:
 
 include ../Makefile.targ
-

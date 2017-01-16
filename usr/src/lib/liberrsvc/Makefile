@@ -20,37 +20,53 @@
 #
 
 #
-# Copyright 2009 Sun Microsystems, Inc.  All rights reserved.
+# Copyright 2010 Sun Microsystems, Inc.  All rights reserved.
 # Use is subject to license terms.
 #
 
-include ../Makefile.lib
+SUBDIRS		=
 
-SUBDIRS=        $(MACH)
-$(BUILD64)SUBDIRS += $(MACH64)
+all		:= TARGET= all
+install		:= TARGET= install
+clean		:= TARGET= clean
+clobber		:= TARGET= clobber
+lint		:= TARGET= lint
 
-all :=          TARGET= all
-clean :=        TARGET= clean
-clobber :=      TARGET= clobber
-install :=      TARGET= install
-lint :=         TARGET= lint
+LIBRARY		= liberrsvc.a
+VERS		= .1
 
-.KEEP_STATE:
-
-all clean clobber install lint: $(SUBDIRS)
+OBJECTS		= errsvc.o
 
 PRIVHDRS	= liberrsvc_priv.h
 EXPHDRS		= liberrsvc.h liberrsvc_defs.h
 HDRS		= $(EXPHDRS) $(PRIVHDRS)
 
+include ../Makefile.lib
+
+INCLUDE		= -I/usr/include/python2.6
+
+CPPFLAGS	+= ${INCLUDE} $(CPPFLAGS.master)
+CFLAGS		+= $(DEBUG_CFLAGS) -Xa ${CPPFLAGS} -DNDEBUG
+SOFLAGS		+= -L$(ROOTADMINLIB) -R$(ROOTADMINLIB:$(ROOT)%=%) -L/lib \
+		-lpython2.6 -lc -zdefs
+
+static:		$(LIBS)
+
+dynamic:	$(DYNLIB) $(DYNLIBLINK)
+
+all:		$(HDRS) dynamic .WAIT $(SUBDIRS)
+
 install_h:	$(EXPHDRS:%=$(ROOTINC)/%)
 
-check: $(CHECKHDRS)
+install:	all .WAIT \
+		$(ROOTUSRLIB) $(ROOTUSRLIBDYNLIB) \
+		$(ROOTUSRLIBDYNLIBLINK) 
+
+lint:		lint_SRCS
 
 $(SUBDIRS):	FRC
-	@cd $@; pwd; $(MAKE) $(TARGET)
+	cd $@; pwd; $(MAKE) $(TARGET)
 
 FRC:
 
 include ../Makefile.targ
-

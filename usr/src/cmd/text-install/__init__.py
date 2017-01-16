@@ -23,7 +23,7 @@
 #
 
 '''
-Text / (n)Curses based UI for installing OmniOS
+Text / (n)Curses based UI for installing v9os
 '''
 
 import gettext
@@ -50,7 +50,7 @@ if console_type != SERIAL_CONSOLE:
 # Defined here to avoid circular import errors
 _ = gettext.translation("textinstall", "/usr/share/locale",
                         fallback=True).ugettext
-RELEASE = {"release": _("OmniOS")}
+RELEASE = {"release": _("v9os")}
 TUI_HELP = "/usr/share/text-install/help"
 
 # Localized values used by other files
@@ -80,6 +80,7 @@ import signal
 import subprocess
 import sys
 import traceback
+import time
 
 from optparse import OptionParser
 
@@ -178,6 +179,10 @@ def make_screen_list(main_win, target_controller, install_data):
     # in parallel in multiple threads and it might lead to deadlock
     # as discussed in Python bug 2320.
     disk_screen.start_discovery()
+   
+    # wait for all disks to be discovered
+    while disk_screen._target_discovery_status != InstallEngine.EXEC_SUCCESS:
+        time.sleep(1) 
     
     # result.append(SummaryScreen(main_win))
     result.append(InstallProgress(main_win, install_data, target_controller))
