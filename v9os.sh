@@ -21,7 +21,8 @@
 
 #
 # Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
-#
+# Copyright 2016 Alexander Eremin <alexander.r.eremin@gmail.com>
+
 ON_CLOSED_BINS=/opt/onbld/closed
 
 # Configuration variables for the runtime environment of the nightly
