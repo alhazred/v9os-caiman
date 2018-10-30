@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 #
 # CDDL HEADER START
 #
@@ -324,10 +324,10 @@ class InstallLogger(logging.Logger):
         '''Returns the name of the default log '''
         return self.default_log_file
 
-    @property
-    def name(self):
-        '''returns the name of the logger'''
-        return self.name
+#    @property
+#    def name(self):
+#        '''returns the name of the logger'''
+#        return self.name
 
     def addHandler(self, handler):
         '''Adds the requested handler to the InstallLogger

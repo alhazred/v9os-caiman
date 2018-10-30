@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 #
 # CDDL HEADER START
 #
@@ -67,8 +67,7 @@ class CleanupCPIOInstall(ICT.ICTBaseClass):
 
         self.cleanup_list = ['.livecd', '.volsetid', '.textinstall',
                              'etc/sysconfig/language', '.liveusb',
-                             'a', 'bootcd_microroot', 'var/user/jack',
-                             'var/cache/gdm/jack/dmrc', 'var/cache/gdm/jack/']
+                             'a', 'bootcd_microroot'] 
 
     def execute(self, dry_run=False):
         '''

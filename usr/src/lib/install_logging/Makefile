@@ -41,12 +41,12 @@ HDRS            = $(EXPHDRS) $(PRIVHDRS)
 
 include ../Makefile.lib
 
-INCLUDE		= -I/usr/include/python2.6
+INCLUDE		= -I/usr/include/python2.7
 
 CPPFLAGS        += ${INCLUDE} -D${ARCH}
 CFLAGS		+= $(DEBUG_CFLAGS) -Xa ${CPPFLAGS} -DNDEBUG
 SOFLAGS		+= -L$(ROOTADMINLIB) -R$(ROOTADMINLIB:$(ROOT)%=%) \
-		-lpython2.6 -lnvpair -lerrsvc
+		-lpython2.7 -lnvpair -lerrsvc
 
 all:		$(HDRS) dynamic .WAIT $(SUBDIRS)
 

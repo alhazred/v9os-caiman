@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 #
 # CDDL HEADER START
 #
@@ -731,7 +731,7 @@ class TestCPIOFunctions(unittest.TestCase):
         self.tr_node.action = "transform"
         self.tr_node.contents = self.TEST_MEDIA_TRANSFORM
         with open(self.TEST_MEDIA_TRANSFORM, 'w') as filehandle:
-            filehandle.write("#!/usr/bin/python\n")
+            filehandle.write("#!/usr/bin/python2.7\n")
             filehandle.write("import os\n")
             mkdir_cmd = "os.mkdir('" + self.TEST_DST_DIR + "')"
             filehandle.write(mkdir_cmd + "\n")
@@ -1012,7 +1012,7 @@ class TestCPIOAttrFunctions(unittest.TestCase):
         self.tr_cpio.dst = self.TEST_DST_DIR
         self.tr_cpio.media_transform = self.TEST_MEDIA_TRANSFORM
         with open(self.TEST_MEDIA_TRANSFORM, 'w') as filehandle:
-            filehandle.write("#!/usr/bin/python\n")
+            filehandle.write("#!/usr/bin/python2.7\n")
         os.chmod(self.TEST_MEDIA_TRANSFORM, 0777)
 
         # The CPIO values that are specified

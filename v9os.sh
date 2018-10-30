@@ -52,10 +52,10 @@ export NIGHTLY_OPTIONS="-AMNndlmp +t";
 
 # This is a variable for the rest of the script - GATE doesn't matter to
 # nightly itself
-export GATE=caiman
+export GATE=v9os-caiman
 
 # CODEMGR_WS - where is your workspace at (or what should nightly name it)
-export CODEMGR_WS=/data/caiman
+export CODEMGR_WS=/code/v9os-caiman
 
 # PARENT_WS is used to determine the parent of this workspace. This is
 # for the options that deal with the parent workspace (such as where the
@@ -191,4 +191,4 @@ CHECK_PATHS=n
 # nightly(1) for interactions between environment variables and this command.
 #POST_NIGHTLY=
 PKGPUBLISHER_REDIST=v9os; export PKGPUBLISHER_REDIST;
-PKGVERS_BRANCH=0.151100; export PKGVERS_BRANCH;
+PKGVERS_BRANCH=0.151101; export PKGVERS_BRANCH;

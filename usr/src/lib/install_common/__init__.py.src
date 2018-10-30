@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 # CDDL HEADER START
 #
 # The contents of this file are subject to the terms of the
@@ -72,7 +72,7 @@ SYS_AI_MANIFEST_DTD = "/usr/share/install/ai.dtd.@DTD_VERSION_AI@"
 
 # global version number for all of the consumers of the pkg5 API in the source
 # tree
-PKG5_API_VERSION = 70
+PKG5_API_VERSION = 82
 
 # Reg-exp to match that a given string would be a valid DTD path for Install
 DTD_PATH_RE = ".*\.dtd\.\d+$"

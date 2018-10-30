@@ -43,7 +43,6 @@ SUBDIRS=	bootmgmt \
 		libaiscf_pymod \
 		liberrsvc \
 		liberrsvc_pymod \
-		libspmicommon \
 		libzoneinfo_pymod \
 		netif \
 		terminalui

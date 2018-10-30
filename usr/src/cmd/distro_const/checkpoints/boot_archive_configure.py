@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 #
 # CDDL HEADER START
 #
@@ -100,6 +100,10 @@ class BootArchiveConfigure(Checkpoint):
                os.path.join(self.ba_build, "etc/rtc_config")]
         run(cmd)
 
+        # set default hostname 
+        hostname_path = os.path.join(self.ba_build, "etc/nodename")
+        os.system('echo v9os > ' + hostname_path)
+ 
         # go to the ba_build
         self.logger.debug("creating symlinks and mountpoints")
         os.chdir(self.ba_build)
@@ -262,6 +266,9 @@ class BootArchiveConfigure(Checkpoint):
 
                         misc_symlinks.append(os.path.join(root, f))
 
+        # We don't want readonly ttymon log in misc
+        os.remove(os.path.join(self.ba_build,"var/saf/zsmon/log"))
+
         tr_uninstall = CPIOSpec()
         tr_uninstall.action = CPIOSpec.UNINSTALL
         tr_uninstall.contents = misc_symlinks
@@ -391,64 +398,14 @@ class LiveCDBootArchiveConfigure(BootArchiveConfigure, Checkpoint):
         self.image_type = arg.get("image_type",
                                   self.DEFAULT_ARG.get("image_type"))
 
-    def configure_gdm(self):
-        """ class method to configure gdm to automatically log the jack user on
-        after GNOME starts.
-        """
-        self.logger.debug("Configuring gdm for LiveCD boot")
-        # Enable auto-login in gdm, and save original to replace after
-        # installation
-        self.logger.debug("updating gdm's custom.conf file")
-
-        # save the original /etc/gdm/custom.conf in the boot_archive to
-        # the /save directory
-        if not os.path.exists(os.path.join(self.pkg_img_path, "save/etc/gdm")):
-            os.makedirs(os.path.join(self.pkg_img_path, "save/etc/gdm"))
-
-        shutil.copy2(os.path.join(self.ba_build, "etc/gdm/custom.conf"),
-                     os.path.join(self.pkg_img_path,
-                                  "save/etc/gdm/custom.conf"))
-
-        # delete the original custom.conf
-        os.remove(os.path.join(self.ba_build, "etc/gdm/custom.conf"))
-
-        # change to etc/gdm
-        os.chdir(os.path.join(self.pkg_img_path, "etc/gdm"))
-
-        with open("./custom.conf", "r") as fh:
-            custom_conf = fh.readlines()
-
-        # walk the lines and when the [daemon] line comes up, append the
-        # entries to auto-login the 'jack' user
-        with open("./custom.conf", "w") as fh:
-            for line in custom_conf:
-                if not line.startswith("[daemon]"):
-                    fh.write(line)
-                else:
-                    # write this line out
-                    fh.write(line)
-
-                    # write the rest of the entries
-                    fh.write("AutomaticLoginEnable=true\n")
-                    fh.write("AutomaticLogin=jack\n")
-                    fh.write("GdmXserverTimeout=30\n")
-
     def configure_sudoers(self):
         """ class method to configure /etc/sudoers
         """
-        # Give jack administrator profile and convert root to a role
-        self.logger.debug("updating sudoers for root and jack")
-
-        # give jack full sudo rights, saving sudoers for restoraton during
-        # install
         if not os.path.exists(os.path.join(self.pkg_img_path, "save/etc")):
             os.makedirs(os.path.join(self.pkg_img_path, "save/etc"))
 
         shutil.copy2(os.path.join(self.ba_build, "etc/sudoers"),
                      os.path.join(self.pkg_img_path, "save/etc/sudoers"))
-
-        with open(os.path.join(self.ba_build, "etc", "sudoers"), "a") as fh:
-            fh.write("jack ALL=(ALL) ALL\n")
 
     def execute(self, dry_run=False):
         """ Primary execution method used by the Checkpoint parent class.
@@ -462,9 +419,6 @@ class LiveCDBootArchiveConfigure(BootArchiveConfigure, Checkpoint):
 
         # configure various boot archive files
         self.configure_system()
-
-        # configure gdm for automatic login
-        self.configure_gdm()
 
         # configure /etc/sudoers
         self.configure_sudoers()

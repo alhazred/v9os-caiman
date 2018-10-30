@@ -24,7 +24,7 @@
 
 include $(SRC)/Makefile.master
 
-SUBDIRS=	config mount_media svc trace user/jack var_pkg_move
+SUBDIRS=	config mount_media svc trace var_pkg_move
 
 .PARALLEL:
 
